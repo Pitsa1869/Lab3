@@ -34,9 +34,9 @@ namespace Lab3
 
         public void AddCourse(Course course, DateTime completionDate)
         {
-            this.CompletedCourses.Add(new EmployeeCourse(course, completionDate));
+            this.CompletedCourses.Add(new EmployeeCourse(course,completionDate) );
         }
-
+        
         public List<EmployeeCourse> GetCourses()
         {
             return this.CompletedCourses;
@@ -46,24 +46,23 @@ namespace Lab3
         {
 
 
+           
 
             foreach (var course in this.CompletedCourses)
             {
-
                 if (course == CompletedCourses.First())
                 {
-                    Console.WriteLine($"{this.EmployeeNum,-15}|{this.FirstName,-20}|{this.Surname,-20}" +
-                $"|{course.Course.CourseCode + " - " + course.CompletionDate,-40}");
+                    Console.WriteLine($"{this.EmployeeNum,-15}{this.FirstName,-20}{this.Surname,-20}" +
+                $"{course.Course.CourseCode + " - " + course.CompletionDate,-40}");
                 }
                 else
                 {
-                    Console.WriteLine($"{"",-15}|{"",-20}|{"",-20}" +
-                $"|{course.Course.CourseCode + " - " + course.CompletionDate,-40}");
+                    Console.WriteLine($"{"",-15}{"",-20}{"",-20}" +
+                $"{course.Course.CourseCode + " - " + course.CompletionDate,-40}");
                 }
-
+                
             }
-           
+            Console.WriteLine();
         }
     }
 }
-

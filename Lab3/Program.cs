@@ -38,7 +38,7 @@ namespace Lab3
                 {
                     case 1:
                         {
-                            DisplayEmployees(employees);
+                            DisplayEmployee(employees);
                             break;
                         }
                     case 2:
@@ -56,10 +56,9 @@ namespace Lab3
                             Dictionary<Course, List<Employee>> listOfEmployeesByCourse = new Dictionary<Course, List<Employee>>();
 
                             listOfEmployeesByCourse = ListEmployeesByCourse(employees, courses);
-                            
-                            foreach (KeyValuePair<Course, List<Employee>> KVP in listOfEmployeesByCourse)
+
+                            foreach (var KVP in listOfEmployeesByCourse)
                             {
-                                PrintDashes();
                                 Console.Write($"\n{KVP.Key.CourseCode} : ");
                                 foreach (Employee employee in KVP.Value)
                                 {
@@ -69,15 +68,13 @@ namespace Lab3
                                     else
                                         Console.Write($"{employee.FirstName} {employee.Surname} ");
                                 }
-                                Console.WriteLine();
-
+                                
                             }
-                            
                             break;
                         }
                     case 5:
                         {
-                            
+
                             break;
                         }
                     case 6:
@@ -202,16 +199,12 @@ namespace Lab3
             employees[9].AddCourse(courses[1], new DateTime(2025, 7, 2));
         }
 
-        public static void DisplayEmployees(List<Employee> employees)
+        public static void DisplayEmployee(List<Employee> employees)
         {
-            Console.WriteLine($"{ "EmployeeNum" , -15}|{"FirstName",-20}|{"Surname", -20}|{"CompletedCourse", -40}");
-
-            PrintDashes();
-
+            Console.WriteLine($"{ "EmployeeNum" , -15}{"FirstName",-20}{"Surname", -20}{"CompletedCourse", -40}");
             foreach (Employee employee in employees)
             {
                 employee.Print();
-                PrintDashes();
             }
         }
 
@@ -295,7 +288,7 @@ namespace Lab3
             return dictionary;
         }
 
-        
+
         public static bool IsInt(string input)
         {
             int output;
@@ -318,17 +311,6 @@ namespace Lab3
             Console.WriteLine("9. Exit");
             Console.WriteLine("--------------------------------------------------------------------");
             Console.WriteLine();
-        }
-
-        public static void PrintDashes()
-        {
-            Console.WriteLine($"{string.Concat(Enumerable.Repeat("-", 15))}|{string.Concat(Enumerable.Repeat("-", 20))}|" +
-               $"{string.Concat(Enumerable.Repeat("-", 20))}|{string.Concat(Enumerable.Repeat("-", 40))}");
-            
-            //string dashes = new string('-', 95);
-            //Console.WriteLine(dashes);
-
-            
         }
     }
 }
