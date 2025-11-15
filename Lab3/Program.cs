@@ -67,6 +67,7 @@ namespace Lab3
                                         Console.Write($"{employee.FirstName} {employee.Surname}, ");
                                     else
                                         Console.Write($"{employee.FirstName} {employee.Surname} ");
+                                    Console.Write($"{employee.FirstName} {employee.Surname} ");
                                 }
                                 
                             }
