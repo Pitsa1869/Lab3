@@ -44,11 +44,23 @@ namespace Lab3
 
         public void Print()
         {
-            
-            Console.Write($"{this.EmployeeNum} \t\t {this.FirstName}  \t {this.Surname} \t");
+
+
+           
+
             foreach (var course in this.CompletedCourses)
             {
-                Console.Write($"{course.Course.CourseCode} - {course.CompletionDate}\n\t\t\t\t\t");
+                if (course == CompletedCourses.First())
+                {
+                    Console.WriteLine($"{this.EmployeeNum,-15}{this.FirstName,-20}{this.Surname,-20}" +
+                $"{course.Course.CourseCode + " - " + course.CompletionDate,-40}");
+                }
+                else
+                {
+                    Console.WriteLine($"{"",-15}{"",-20}{"",-20}" +
+                $"{course.Course.CourseCode + " - " + course.CompletionDate,-40}");
+                }
+                
             }
             Console.WriteLine();
         }

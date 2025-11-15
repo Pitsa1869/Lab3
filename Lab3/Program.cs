@@ -74,6 +74,7 @@ namespace Lab3
                         }
                     case 5:
                         {
+
                             break;
                         }
                     case 6:
@@ -200,7 +201,7 @@ namespace Lab3
 
         public static void DisplayEmployee(List<Employee> employees)
         {
-            Console.WriteLine("EmployeeNum\t FirstName \t Surname \t CompletedCourse \t");
+            Console.WriteLine($"{ "EmployeeNum" , -15}{"FirstName",-20}{"Surname", -20}{"CompletedCourse", -40}");
             foreach (Employee employee in employees)
             {
                 employee.Print();
