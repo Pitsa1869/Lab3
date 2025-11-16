@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using Microsoft.CSharp.RuntimeBinder;
+using System.Net;
+using System.Net.Http.Headers;
 using System.Net.WebSockets;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography.X509Certificates;
@@ -8,18 +10,18 @@ namespace Lab3
     internal class Program
     {
 
-        
+
         static void Main(string[] args)
         {
             List<Employee> employees = new List<Employee>();
             List<Course> courses = new List<Course>();
-            
+
             SetUpData(courses, employees);
 
 
             int option = -1;
             string input;
-
+            int count = 1;
 
             while (option != 9)
             {
@@ -33,6 +35,7 @@ namespace Lab3
                     Console.WriteLine("Option must be numeric");
                     input = Console.ReadLine() ?? string.Empty;
                 }
+                Console.WriteLine();
                 option = int.Parse(input);
                 switch (option)
                 {
@@ -55,10 +58,18 @@ namespace Lab3
                         {
                             Dictionary<Course, List<Employee>> listOfEmployeesByCourse = new Dictionary<Course, List<Employee>>();
 
-                            listOfEmployeesByCourse = ListEmployeesByCourse(employees, courses);
 
-                            foreach (var KVP in listOfEmployeesByCourse)
+                            listOfEmployeesByCourse = ListOfEmployeesByCourse(employees, courses);
+
+
+
+
+                            PrintDashes();
+                            Console.WriteLine($"{"List of employees by course",65}");
+                            foreach (KeyValuePair<Course, List<Employee>> KVP in listOfEmployeesByCourse)
+
                             {
+
                                 Console.Write($"\n{KVP.Key.CourseCode} : ");
                                 foreach (Employee employee in KVP.Value)
                                 {
@@ -68,17 +79,70 @@ namespace Lab3
                                     else
                                         Console.Write($"{employee.FirstName} {employee.Surname} ");
                                 }
-                                
+                                Console.WriteLine();
+
+
                             }
-                            break;
-                        }
-                    case 5:
-                        {
+
+                            PrintDashes();
 
                             break;
                         }
+
+                    case 5:
+                        {
+
+                            List<string> codes = new List<string>();
+
+                            Dictionary<Course, List<Employee>> listOfEmployeesByEnteredCourses = new Dictionary<Course, List<Employee>>();
+                            Console.WriteLine("Enter Course Codes (Press enter to stop):");
+                            IEnumerable<Employee> intersect = new List<Employee>();
+                            input = Console.ReadLine() ?? string.Empty;
+                            codes.Add(input);
+                            while (input != string.Empty)
+                            {
+                                input = Console.ReadLine() ?? string.Empty;
+                                codes.Add(input);
+                            }
+
+                            listOfEmployeesByEnteredCourses = ListOfEmployeesByEnteredCourses(employees, courses, codes);
+                            intersect = listOfEmployeesByEnteredCourses.Last().Value;
+                            foreach (var KVP in listOfEmployeesByEnteredCourses)
+                            {
+                                intersect = intersect.Intersect(KVP.Value);
+                            }
+                            PrintDashes();
+                            Console.Write("Employees who complted all of the entered courses: ");
+
+                            foreach (var employee in intersect)
+                            {
+                                if (count % 4 == 0)
+                                {
+                                    Console.WriteLine();
+                                }
+
+                                if (employee == intersect.Last())
+                                {
+                                    Console.Write($"{employee.FirstName} {employee.Surname}. ");
+                                }
+                                else
+                                {
+                                    Console.Write($"{employee.FirstName} {employee.Surname}, ");
+                                }
+
+
+
+                                count++;
+
+                            }
+                            Console.WriteLine();
+                            PrintDashes();
+                            break;
+                        }
+
                     case 6:
                         {
+
                             break;
                         }
                     case 7:
@@ -104,9 +168,9 @@ namespace Lab3
 
 
 
-        
 
-        
+
+
         private static void SetUpData(List<Course> courses, List<Employee> employees)
 
         {
@@ -201,11 +265,15 @@ namespace Lab3
 
         public static void DisplayEmployee(List<Employee> employees)
         {
-            Console.WriteLine($"{ "EmployeeNum" , -15}{"FirstName",-20}{"Surname", -20}{"CompletedCourse", -40}");
+            PrintDashes();
+            Console.WriteLine($"{"EmployeeNum",-15}|{"FirstName",-20}|{"Surname",-20}|{"CompletedCourse",-40}");
             foreach (Employee employee in employees)
             {
+                PrintDashes();
                 employee.Print();
+                PrintDashes();
             }
+
         }
 
         public static void AddNewCourse(List<Course> courses)
@@ -257,12 +325,12 @@ namespace Lab3
                 {
                     Console.WriteLine($"{employee.FirstName} {employee.Surname}");
                 }
-                
-                
+
+
             }
         }
 
-        public static Dictionary<Course, List<Employee>> ListEmployeesByCourse(List<Employee> employees, List<Course> courses)
+        public static Dictionary<Course, List<Employee>> ListOfEmployeesByCourse(List<Employee> employees, List<Course> courses)
         {
             Dictionary<Course, List<Employee>> dictionary = new Dictionary<Course, List<Employee>>();
 
@@ -276,7 +344,7 @@ namespace Lab3
                 {
                     foreach (var course in employee.CompletedCourses)
                     {
-                        if(course.Course == KVP.Key)
+                        if (course.Course == KVP.Key)
                         {
                             KVP.Value.Add(employee);
                         }
@@ -288,6 +356,40 @@ namespace Lab3
             return dictionary;
         }
 
+
+        public static Dictionary<Course, List<Employee>> ListOfEmployeesByEnteredCourses(List<Employee> employees, List<Course> courses, List<string> codes)
+        {
+            Dictionary<Course, List<Employee>> dictionary = new Dictionary<Course, List<Employee>>();
+
+
+            foreach (Course course in courses)
+            {
+                foreach (string code in codes)
+                {
+                    if (course.CourseCode == code)
+                    {
+                        dictionary.Add(course, new List<Employee>());
+                    }
+                }
+            }
+
+            foreach (KeyValuePair<Course, List<Employee>> KVP in dictionary)
+            {
+                foreach (Employee employee in employees)
+                {
+                    foreach (EmployeeCourse course in employee.CompletedCourses)
+                    {
+                        if (course.Course == KVP.Key)
+                        {
+                            KVP.Value.Add(employee);
+                        }
+                    }
+                }
+            }
+
+
+            return dictionary;
+        }
 
         public static bool IsInt(string input)
         {
@@ -312,5 +414,18 @@ namespace Lab3
             Console.WriteLine("--------------------------------------------------------------------");
             Console.WriteLine();
         }
+
+
+        public static void PrintDashes()
+        {
+            //Console.WriteLine($"{string.Concat(Enumerable.Repeat("-", 15))}|{string.Concat(Enumerable.Repeat("-", 20))}|" +
+            //   $"{string.Concat(Enumerable.Repeat("-", 20))}|{string.Concat(Enumerable.Repeat("-", 40))}");
+
+            string dashes = new string('-', 95);
+            Console.WriteLine(dashes);
+
+
+        }
+
     }
 }
