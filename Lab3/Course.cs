@@ -28,7 +28,8 @@ namespace Lab3
         }
         public void Print()
         {
-            Console.WriteLine($"{this.CourseCode}\t {this.Description} \t {this.Credits}");
+            
+            Console.WriteLine($"{this.CourseCode,-20}{this.Description,-50}{this.Credits,-10}");
         }
     }
 }

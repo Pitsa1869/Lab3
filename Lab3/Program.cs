@@ -21,7 +21,7 @@ namespace Lab3
 
             int option = -1;
             string input;
-            int count = 1;
+            
 
             while (option != 9)
             {
@@ -41,7 +41,7 @@ namespace Lab3
                 {
                     case 1:
                         {
-                            DisplayEmployee(employees);
+                            DisplayEmployeesAndCourses(employees, courses);
                             break;
                         }
                     case 2:
@@ -51,37 +51,35 @@ namespace Lab3
                         }
                     case 3:
                         {
+                            PrintDashes();
                             DisplayEmployeesWithNoRecentCourse(employees);
+                            PrintDashes();
                             break;
                         }
                     case 4:
                         {
                             Dictionary<Course, List<Employee>> listOfEmployeesByCourse = new Dictionary<Course, List<Employee>>();
 
-
                             listOfEmployeesByCourse = ListOfEmployeesByCourse(employees, courses);
-
-
-
 
                             PrintDashes();
                             Console.WriteLine($"{"List of employees by course",65}");
+
+                            PrintDashes();
+                            Console.WriteLine($"{"Course Code",-15}{"Course Description",-50}{"Completed By",-30}");
+                            PrintDashes();
                             foreach (KeyValuePair<Course, List<Employee>> KVP in listOfEmployeesByCourse)
 
                             {
-
-                                Console.Write($"\n{KVP.Key.CourseCode} : ");
                                 foreach (Employee employee in KVP.Value)
                                 {
 
-                                    if (employee != KVP.Value.Last())
-                                        Console.Write($"{employee.FirstName} {employee.Surname}, ");
+                                    if (employee == KVP.Value.First())
+                                        Console.WriteLine($"{KVP.Key.CourseCode,-15}{KVP.Key.Description,-50}{employee.FirstName+" "+employee.Surname,-30}");
                                     else
-                                        Console.Write($"{employee.FirstName} {employee.Surname} ");
+                                        Console.WriteLine($"{"",-15}{"",-50}{employee.FirstName + " " + employee.Surname,-30}");
                                 }
-                                Console.WriteLine();
-
-
+                                PrintDashes();
                             }
 
                             PrintDashes();
@@ -111,32 +109,21 @@ namespace Lab3
                             {
                                 intersect = intersect.Intersect(KVP.Value);
                             }
-                            PrintDashes();
-                            Console.Write("Employees who complted all of the entered courses: ");
 
+                           
+                            Console.WriteLine($"{"Employees who complted all of the entered courses",75}");
+                            PrintDashes();
+
+                            Console.WriteLine($"{"EmployeeNum",-15}{"FirstName",-20}{"Surname",-20}");
                             foreach (var employee in intersect)
                             {
-                                if (count % 4 == 0)
-                                {
-                                    Console.WriteLine();
-                                }
-
-                                if (employee == intersect.Last())
-                                {
-                                    Console.Write($"{employee.FirstName} {employee.Surname}. ");
-                                }
-                                else
-                                {
-                                    Console.Write($"{employee.FirstName} {employee.Surname}, ");
-                                }
-
-
-
-                                count++;
-
+                                PrintDashes();
+                                Console.WriteLine($"{employee.EmployeeNum,-15}{employee.FirstName,-20}{employee.Surname,-20}");
+                                PrintDashes();
                             }
+
                             Console.WriteLine();
-                            PrintDashes();
+                      
                             break;
                         }
 
@@ -263,10 +250,12 @@ namespace Lab3
             employees[9].AddCourse(courses[1], new DateTime(2025, 7, 2));
         }
 
-        public static void DisplayEmployee(List<Employee> employees)
+        public static void DisplayEmployeesAndCourses(List<Employee> employees,List<Course> courses)
         {
             PrintDashes();
-            Console.WriteLine($"{"EmployeeNum",-15}|{"FirstName",-20}|{"Surname",-20}|{"CompletedCourse",-40}");
+            Console.WriteLine($"{"Employees", 52}");
+            Console.WriteLine();
+            Console.WriteLine($"{"EmployeeNum",-15}{"FirstName",-20}{"Surname",-20}{"CompletedCourse",-40}");
             foreach (Employee employee in employees)
             {
                 PrintDashes();
@@ -274,6 +263,20 @@ namespace Lab3
                 PrintDashes();
             }
 
+            Console.WriteLine("\n\n");
+
+            PrintDashes();
+            Console.WriteLine($"{"Courses",51}");
+
+            Console.WriteLine($"{"Course Code",-20}{"Description",-50}{"Credits",-10}");
+            foreach (Course course in courses)
+            {
+                PrintDashes();
+                course.Print();
+                PrintDashes();
+            }
+            Console.WriteLine();
+            PrintDashes();
         }
 
         public static void AddNewCourse(List<Course> courses)
@@ -307,9 +310,13 @@ namespace Lab3
 
         public static void DisplayEmployeesWithNoRecentCourse(List<Employee> employees)
         {
-            DateTime sixMonth = DateTime.Now.AddMonths(-6);
+            DateTime now = DateTime.Now;
+            DateTime sixMonth = now.AddMonths(-6);
 
-            Console.Write("List of employees who has not completed any course in past 6 months:\n");
+            Console.WriteLine($"{ "List of employees who has not completed any course in past 6 months",80}\n");
+            PrintDashes();
+            Console.WriteLine($"{"EmployeeNum",-15}{"FirstName",-20}{"Surname",-20}");
+
             foreach (Employee employee in employees)
             {
                 int coursecount = 0;
@@ -323,7 +330,9 @@ namespace Lab3
 
                 if (coursecount == 0)
                 {
-                    Console.WriteLine($"{employee.FirstName} {employee.Surname}");
+                    PrintDashes();
+                    Console.WriteLine($"{employee.EmployeeNum,-15}{employee.FirstName,-20}{employee.Surname,-20}");
+                    PrintDashes();
                 }
 
 
