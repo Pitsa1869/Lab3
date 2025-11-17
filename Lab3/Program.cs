@@ -54,6 +54,7 @@ namespace Lab3
                             PrintDashes();
                             DisplayEmployeesWithNoRecentCourse(employees);
                             PrintDashes();
+                            
                             break;
                         }
                     case 4:
@@ -104,8 +105,9 @@ namespace Lab3
                             }
 
                             listOfEmployeesByEnteredCourses = ListOfEmployeesByEnteredCourses(employees, courses, codes);
-                            intersect = listOfEmployeesByEnteredCourses.Last().Value;
-                            foreach (var KVP in listOfEmployeesByEnteredCourses)
+
+                            intersect = listOfEmployeesByEnteredCourses.First().Value;
+                            foreach (KeyValuePair<Course,List<Employee>> KVP in listOfEmployeesByEnteredCourses)
                             {
                                 intersect = intersect.Intersect(KVP.Value);
                             }
@@ -129,19 +131,76 @@ namespace Lab3
 
                     case 6:
                         {
+                            List<string> codes = new List<string>();
 
+                            Dictionary<Course, List<Employee>> listOfEmployeesByEnteredCourses = new Dictionary<Course, List<Employee>>();
+                            Console.WriteLine("Enter Course Codes (Press enter to stop):");
+                            IEnumerable<Employee> set = new List<Employee>();
+                            input = Console.ReadLine() ?? string.Empty;
+                            codes.Add(input);
+                            while (input != string.Empty)
+                            {
+                                input = Console.ReadLine() ?? string.Empty;
+                                codes.Add(input);
+                            }
+                            
+                            listOfEmployeesByEnteredCourses = ListOfEmployeesByEnteredCourses(employees, courses, codes);
+                            set = listOfEmployeesByEnteredCourses.First().Value;
+                            
+                            foreach (KeyValuePair<Course, List<Employee>> KVP in listOfEmployeesByEnteredCourses)
+                            {
+                                set = set.Union(KVP.Value);
+                            }
+                            Console.WriteLine($"{"Employees who complted any of the entered courses",75}");
+                            PrintDashes();
+
+                            Console.WriteLine($"{"EmployeeNum",-15}{"FirstName",-20}{"Surname",-20}");
+                            foreach (Employee employee in set)
+                            {
+                                PrintDashes();
+                                Console.WriteLine($"{employee.EmployeeNum,-15}{employee.FirstName,-20}{employee.Surname,-20}");
+                                PrintDashes();
+                            }
+
+                            Console.WriteLine();
                             break;
                         }
                     case 7:
                         {
+                            string code;
+
+                            Console.Write("Enter course code:");
+
+                            code = Console.ReadLine() ?? string.Empty;
+
+                            DisplayEmployeesWhoDidntCompleteCourse(employees, courses, code);
                             break;
                         }
                     case 8:
                         {
+                            Dictionary<Course, List<Employee>> listOfEmployeesByCourse = new Dictionary<Course, List<Employee>>();
+                            int completedBy, totalEmployees = employees.Count();
+                            double completionPercentage;
+                            listOfEmployeesByCourse = ListOfEmployeesByCourse(employees, courses);
+
+                            Console.WriteLine($"{"Skill Breakdown Report",60}");
+                            PrintDashes();
+                            Console.WriteLine($"{"Course Code", -13}{"Course Description", -27}{"Completed By",-15}" +
+                                $"{"Total Employees",-19}{"Completion Percentage", -15}");
+                            PrintDashes();
+                            foreach (KeyValuePair<Course,List<Employee>> KVP in listOfEmployeesByCourse)
+                            {
+                                completedBy = KVP.Value.Count();
+                                completionPercentage = (double)completedBy / totalEmployees * 100;
+                                Console.WriteLine($"{KVP.Key.CourseCode,-13}{KVP.Key.Description,-27}{completedBy,-15}" +
+                                    $"{totalEmployees,-19}{completionPercentage + "%",-15}");
+                                PrintDashes();
+                            }
                             break;
                         }
                     case 9:
                         {
+                            Console.WriteLine("Bye!");
                             break;
                         }
                     default:
@@ -337,6 +396,7 @@ namespace Lab3
 
 
             }
+            Console.WriteLine();
         }
 
         public static Dictionary<Course, List<Employee>> ListOfEmployeesByCourse(List<Employee> employees, List<Course> courses)
@@ -400,6 +460,48 @@ namespace Lab3
             return dictionary;
         }
 
+        public static void DisplayEmployeesWhoDidntCompleteCourse(List<Employee> employees, List<Course> courses, string code)
+        {
+            Course EnteredCourse = null;
+            List<Employee> employesWhoCompletedCourse = new List<Employee>();
+            List<Employee> employesWhoDidntCompleteCourse = new List<Employee>();
+            foreach (Course course in courses)
+            {
+                if (course.CourseCode == code)
+                {
+                    EnteredCourse = course;
+                    break;
+                }
+            }
+            if (EnteredCourse == null) {Console.WriteLine("Course not found"); return; }
+
+            foreach (Employee employee in employees)
+            {
+                foreach (EmployeeCourse course in employee.CompletedCourses)
+                {
+                    if (course.Course == EnteredCourse)
+                    {
+                        employesWhoCompletedCourse.Add(employee);
+                    }
+                }
+            }
+
+
+            employesWhoDidntCompleteCourse = employees.Except(employesWhoCompletedCourse).ToList();
+
+            
+            Console.WriteLine($"{"Employees who didn't complete entered course", 70}");
+            PrintDashes();
+            Console.WriteLine($"{"EmployeeNum",-15}{"FirstName",-20}{"Surname",-20}");
+            foreach (Employee employee in employesWhoDidntCompleteCourse)
+            {
+                PrintDashes();
+                Console.WriteLine($"{employee.EmployeeNum,-15}{employee.FirstName,-20}{employee.Surname,-20}");
+                PrintDashes();
+            }
+            Console.WriteLine();
+            
+        }
         public static bool IsInt(string input)
         {
             int output;
@@ -415,8 +517,8 @@ namespace Lab3
             Console.WriteLine("2. Add a New Course to the System");
             Console.WriteLine("3. Display Employees with No Recent Course Completions");
             Console.WriteLine("4. List Employees by Course Completion");
-            Console.WriteLine("5. Search Employees by Completed Courses");
-            Console.WriteLine("6. Search Employees by Completed Courses");
+            Console.WriteLine("5. Search Employees by Completed Courses (AND Condition)");
+            Console.WriteLine("6. Search Employees by Completed Courses (OR Condition) ");
             Console.WriteLine("7. Identify Employees Missing a Specific Cours");
             Console.WriteLine("8. Skill Breakdown Report");
             Console.WriteLine("9. Exit");
