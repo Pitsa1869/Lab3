@@ -39,16 +39,22 @@ namespace Lab3
                 option = int.Parse(input);
                 switch (option)
                 {
+                    //Display Employees Records and Courses
                     case 1:
                         {
                             DisplayEmployeesAndCourses(employees, courses);
                             break;
                         }
+
+                    //Add a New Course to the System
                     case 2:
                         {
                             AddNewCourse(courses);
+                            Console.WriteLine("New course has been added to the system");
                             break;
                         }
+
+                    //Display Employees with No Recent Course 
                     case 3:
                         {
                             PrintDashes();
@@ -57,6 +63,8 @@ namespace Lab3
                             
                             break;
                         }
+
+                    //List Employees by Course Completion 
                     case 4:
                         {
                             Dictionary<Course, List<Employee>> listOfEmployeesByCourse = new Dictionary<Course, List<Employee>>();
@@ -72,9 +80,14 @@ namespace Lab3
                             foreach (KeyValuePair<Course, List<Employee>> KVP in listOfEmployeesByCourse)
 
                             {
+                                //If there are no employees completed this course just print course code and description    
+                                if(KVP.Value.Count < 1)
+                                {
+                                    Console.WriteLine($"{KVP.Key.CourseCode,-15}{KVP.Key.Description,-50}");
+                                }
+                                //else  print employees as well
                                 foreach (Employee employee in KVP.Value)
                                 {
-
                                     if (employee == KVP.Value.First())
                                         Console.WriteLine($"{KVP.Key.CourseCode,-15}{KVP.Key.Description,-50}{employee.FirstName+" "+employee.Surname,-30}");
                                     else
@@ -88,6 +101,7 @@ namespace Lab3
                             break;
                         }
 
+                    //Search Employees by Completed Courses (AND Condition) 
                     case 5:
                         {
 
@@ -95,76 +109,142 @@ namespace Lab3
 
                             Dictionary<Course, List<Employee>> listOfEmployeesByEnteredCourses = new Dictionary<Course, List<Employee>>();
                             Console.WriteLine("Enter Course Codes (Press enter to stop):");
-                            IEnumerable<Employee> intersect = new List<Employee>();
+
+                            
                             input = Console.ReadLine() ?? string.Empty;
-                            codes.Add(input);
-                            while (input != string.Empty)
+                            codes.Add(input); 
+                            while (input != string.Empty) //Entering codes to the list till user presses enter
                             {
                                 input = Console.ReadLine() ?? string.Empty;
                                 codes.Add(input);
                             }
-
+                            
+                            if (codes.Count < 2 && codes.First() == string.Empty) //If there are no codes entered stop the case
+                            {
+                                Console.WriteLine("You haven't entered any courses");
+                                break;
+                            }
                             listOfEmployeesByEnteredCourses = ListOfEmployeesByEnteredCourses(employees, courses, codes);
 
-                            intersect = listOfEmployeesByEnteredCourses.First().Value;
-                            foreach (KeyValuePair<Course,List<Employee>> KVP in listOfEmployeesByEnteredCourses)
+                            //If there are no courses with such codes - return
+                            if(listOfEmployeesByEnteredCourses.Count < 1)
                             {
-                                intersect = intersect.Intersect(KVP.Value);
+                                Console.WriteLine("There are no courses with such codes");
+                                break;
                             }
 
-                           
-                            Console.WriteLine($"{"Employees who complted all of the entered courses",75}");
-                            PrintDashes();
+                            //Make first Key Value Pair our start point. Intersect is the same as tempList
+                            //We are using templist to remove employees from the list if they are not found in particular Dictionary Pair
+                            //Since if we will remove them directly from intersect it will break foreach loop
+                            List<Employee> intersect = new List<Employee>(listOfEmployeesByEnteredCourses.First().Value);
+                            List<Employee> tempList = new List<Employee>(listOfEmployeesByEnteredCourses.First().Value);
 
-                            Console.WriteLine($"{"EmployeeNum",-15}{"FirstName",-20}{"Surname",-20}");
-                            foreach (var employee in intersect)
+                            foreach (KeyValuePair<Course, List<Employee>> KVP in listOfEmployeesByEnteredCourses)
                             {
-                                PrintDashes();
-                                Console.WriteLine($"{employee.EmployeeNum,-15}{employee.FirstName,-20}{employee.Surname,-20}");
-                                PrintDashes();
+                                //If employee from the intersect is not found in the employee list of the course
+                                //- remove this employee from intersect
+                                foreach (Employee employee in tempList)
+                                {
+                                    if (!KVP.Value.Exists(e => e == employee))
+                                    {
+                                        intersect.Remove(employee);
+                                    }
+                                }
+
+                                //Recreate templist so now it is = to intersect
+                                tempList.Clear();
+                                foreach (Employee employee in intersect) { tempList.Add(employee); }
                             }
 
-                            Console.WriteLine();
-                      
+                            //If there are employees who completed all of entered courses print them
+                            if (intersect.Count > 0)
+                            {
+                                Console.WriteLine($"{"Employees who complted all of the entered courses",75}");
+                                PrintDashes();
+
+                                Console.WriteLine($"{"EmployeeNum",-15}{"FirstName",-20}{"Surname",-20}");
+                                if (intersect.Count != 0)
+                                {
+                                    foreach (var employee in intersect)
+                                    {
+                                        PrintDashes();
+                                        Console.WriteLine($"{employee.EmployeeNum,-15}{employee.FirstName,-20}{employee.Surname,-20}");
+                                        PrintDashes();
+                                    }
+                                }
+                                Console.WriteLine();
+                            }
+                            //If not say so
+                            else
+                            {
+                                Console.WriteLine("There are no employees who have completed all of the courses entered");
+                            }
+
                             break;
                         }
 
+                    //Search Employees by Completed Courses (OR Condition)
                     case 6:
                         {
                             List<string> codes = new List<string>();
-
+                            List<Employee> set = new List<Employee>();
                             Dictionary<Course, List<Employee>> listOfEmployeesByEnteredCourses = new Dictionary<Course, List<Employee>>();
+
                             Console.WriteLine("Enter Course Codes (Press enter to stop):");
-                            IEnumerable<Employee> set = new List<Employee>();
+                            
+
                             input = Console.ReadLine() ?? string.Empty;
                             codes.Add(input);
-                            while (input != string.Empty)
+                            while (input != string.Empty) // Enter codes till user presses enter
                             {
                                 input = Console.ReadLine() ?? string.Empty;
                                 codes.Add(input);
                             }
                             
+                            if(codes.Count < 2 && codes.First() == string.Empty) // If user entered no coureses
+                            {
+                                Console.WriteLine("You haven't entered any courses"); 
+                                break;
+                            }
+                            //Create a list of employees who has completed the entered courses
                             listOfEmployeesByEnteredCourses = ListOfEmployeesByEnteredCourses(employees, courses, codes);
-                            set = listOfEmployeesByEnteredCourses.First().Value;
-                            
+
                             foreach (KeyValuePair<Course, List<Employee>> KVP in listOfEmployeesByEnteredCourses)
                             {
-                                set = set.Union(KVP.Value);
+                                foreach(Employee employee in KVP.Value)
+                                {
+                                    if(!set.Exists(e => e == employee)) // Add employee to the set if they are not there
+                                    {
+                                        set.Add(employee);
+                                    }
+                                }
                             }
-                            Console.WriteLine($"{"Employees who complted any of the entered courses",75}");
-                            PrintDashes();
 
-                            Console.WriteLine($"{"EmployeeNum",-15}{"FirstName",-20}{"Surname",-20}");
-                            foreach (Employee employee in set)
+                            if (set.Count > 0) // If there are employees who completed any of entered courses print them
                             {
+                                Console.WriteLine($"{"Employees who complted any of the entered courses",75}");
                                 PrintDashes();
-                                Console.WriteLine($"{employee.EmployeeNum,-15}{employee.FirstName,-20}{employee.Surname,-20}");
-                                PrintDashes();
+
+                                Console.WriteLine($"{"EmployeeNum",-15}{"FirstName",-20}{"Surname",-20}");
+
+                                foreach (Employee employee in set)
+                                {
+                                    PrintDashes();
+                                    Console.WriteLine($"{employee.EmployeeNum,-15}{employee.FirstName,-20}{employee.Surname,-20}");
+                                    PrintDashes();
+                                }
                             }
+                            else //If not say so
+                            {
+                                Console.WriteLine("There are no employees who have completed any of the courses entered");
+                            }
+                            
 
                             Console.WriteLine();
                             break;
                         }
+
+                    //Identify Employees Missing a Specific Course 
                     case 7:
                         {
                             string code;
@@ -176,10 +256,13 @@ namespace Lab3
                             DisplayEmployeesWhoDidntCompleteCourse(employees, courses, code);
                             break;
                         }
+
+                    //Skill Breakdown Report 
                     case 8:
                         {
                             Dictionary<Course, List<Employee>> listOfEmployeesByCourse = new Dictionary<Course, List<Employee>>();
-                            int completedBy, totalEmployees = employees.Count();
+                            int completedBy, 
+                                totalEmployees = employees.Count();
                             double completionPercentage;
                             listOfEmployeesByCourse = ListOfEmployeesByCourse(employees, courses);
 
@@ -198,6 +281,8 @@ namespace Lab3
                             }
                             break;
                         }
+                    
+                    //Exit
                     case 9:
                         {
                             Console.WriteLine("Bye!");
@@ -311,6 +396,7 @@ namespace Lab3
 
         public static void DisplayEmployeesAndCourses(List<Employee> employees,List<Course> courses)
         {
+            //Emoloyees
             PrintDashes();
             Console.WriteLine($"{"Employees", 52}");
             Console.WriteLine();
@@ -324,6 +410,7 @@ namespace Lab3
 
             Console.WriteLine("\n\n");
 
+            //Courses
             PrintDashes();
             Console.WriteLine($"{"Courses",51}");
 
@@ -340,6 +427,7 @@ namespace Lab3
 
         public static void AddNewCourse(List<Course> courses)
         {
+            
             Course course = new Course();
             string code, description, input;
             int credits;
@@ -371,26 +459,36 @@ namespace Lab3
         {
             DateTime now = DateTime.Now;
             DateTime sixMonth = now.AddMonths(-6);
+            EmployeeCourse lastCourse;
 
             Console.WriteLine($"{ "List of employees who has not completed any course in past 6 months",80}\n");
             PrintDashes();
-            Console.WriteLine($"{"EmployeeNum",-15}{"FirstName",-20}{"Surname",-20}");
+            Console.WriteLine($"{"EmployeeNum",-15}{"FirstName",-20}{"Surname",-20}{"Last Course Completed",-30}");
 
             foreach (Employee employee in employees)
             {
                 int coursecount = 0;
+                //fisrt course in employee courses list now is the most recent as a starting point
+                lastCourse = employee.CompletedCourses.First();
                 foreach (EmployeeCourse course in employee.CompletedCourses)
                 {
+                    //Increase count if course was completed less than 6 month ago
                     if (course.CompletionDate > sixMonth)
                     {
                         coursecount++;
+                    }
+                    // If course was completed later than previous most recent - this course will be the most recent
+                    if (course.CompletionDate > lastCourse.CompletionDate)
+                    {
+                        lastCourse = course;
                     }
                 }
 
                 if (coursecount == 0)
                 {
                     PrintDashes();
-                    Console.WriteLine($"{employee.EmployeeNum,-15}{employee.FirstName,-20}{employee.Surname,-20}");
+                    Console.WriteLine($"{employee.EmployeeNum,-15}{employee.FirstName,-20}{employee.Surname,-20}" +
+                        $"{lastCourse.Course.CourseCode+" - "+lastCourse.CompletionDate.ToLongDateString(), -30}");
                     PrintDashes();
                 }
 
@@ -403,10 +501,13 @@ namespace Lab3
         {
             Dictionary<Course, List<Employee>> dictionary = new Dictionary<Course, List<Employee>>();
 
-            for (int i = 0; i < courses.Count; i++)
+            //Adding all courses in dictionary
+            foreach (Course course in courses)
             {
-                dictionary.Add(courses[i], new List<Employee>());
+                dictionary.Add(course, new List<Employee>());
             }
+
+            //Assign employees to course if they have completed it
             foreach (KeyValuePair<Course, List<Employee>> KVP in dictionary)
             {
                 foreach (var employee in employees)
@@ -430,7 +531,7 @@ namespace Lab3
         {
             Dictionary<Course, List<Employee>> dictionary = new Dictionary<Course, List<Employee>>();
 
-
+            //Adding courses by codes entered in dictionary
             foreach (Course course in courses)
             {
                 foreach (string code in codes)
@@ -442,6 +543,7 @@ namespace Lab3
                 }
             }
 
+            //Assign employees to course if they have completed it
             foreach (KeyValuePair<Course, List<Employee>> KVP in dictionary)
             {
                 foreach (Employee employee in employees)
@@ -462,9 +564,10 @@ namespace Lab3
 
         public static void DisplayEmployeesWhoDidntCompleteCourse(List<Employee> employees, List<Course> courses, string code)
         {
-            Course EnteredCourse = null;
-            List<Employee> employesWhoCompletedCourse = new List<Employee>();
+            Course EnteredCourse = null!;
             List<Employee> employesWhoDidntCompleteCourse = new List<Employee>();
+
+            //Check if there is a course with entered code
             foreach (Course course in courses)
             {
                 if (course.CourseCode == code)
@@ -473,21 +576,31 @@ namespace Lab3
                     break;
                 }
             }
+            //If not return
             if (EnteredCourse == null) {Console.WriteLine("Course not found"); return; }
 
+            //If yes check if this course exists in employee's courses list
             foreach (Employee employee in employees)
             {
+                //Default is course not found
+                bool courseFound = false;
                 foreach (EmployeeCourse course in employee.CompletedCourses)
                 {
+                    //But if course is found it becomes true
                     if (course.Course == EnteredCourse)
                     {
-                        employesWhoCompletedCourse.Add(employee);
+                        courseFound = true;
                     }
+                }
+                //If course wasn't found in employee completed courses list add it to our list
+                if (!courseFound)
+                {
+                    employesWhoDidntCompleteCourse.Add(employee);
                 }
             }
 
 
-            employesWhoDidntCompleteCourse = employees.Except(employesWhoCompletedCourse).ToList();
+            
 
             
             Console.WriteLine($"{"Employees who didn't complete entered course", 70}");
@@ -529,13 +642,8 @@ namespace Lab3
 
         public static void PrintDashes()
         {
-            //Console.WriteLine($"{string.Concat(Enumerable.Repeat("-", 15))}|{string.Concat(Enumerable.Repeat("-", 20))}|" +
-            //   $"{string.Concat(Enumerable.Repeat("-", 20))}|{string.Concat(Enumerable.Repeat("-", 40))}");
-
             string dashes = new string('-', 95);
             Console.WriteLine(dashes);
-
-
         }
 
     }
