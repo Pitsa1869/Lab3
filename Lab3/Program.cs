@@ -81,7 +81,7 @@ namespace Lab3
 
                             {
                                 //If there are no employees completed this course just print course code and description    
-                                if(KVP.Value.Count < 1)
+                                if(KVP.Value.Count() < 1)
                                 {
                                     Console.WriteLine($"{KVP.Key.CourseCode,-15}{KVP.Key.Description,-50}");
                                 }
@@ -119,7 +119,7 @@ namespace Lab3
                                 codes.Add(input);
                             }
                             
-                            if (codes.Count < 2 && codes.First() == string.Empty) //If there are no codes entered stop the case
+                            if (codes.Count() < 2 && codes.First() == string.Empty) //If there are no codes entered stop the case
                             {
                                 Console.WriteLine("You haven't entered any courses");
                                 break;
@@ -127,7 +127,7 @@ namespace Lab3
                             listOfEmployeesByEnteredCourses = ListOfEmployeesByEnteredCourses(employees, courses, codes);
 
                             //If there are no courses with such codes - return
-                            if(listOfEmployeesByEnteredCourses.Count < 1)
+                            if(listOfEmployeesByEnteredCourses.Count() < 1)
                             {
                                 Console.WriteLine("There are no courses with such codes");
                                 break;
@@ -157,13 +157,13 @@ namespace Lab3
                             }
 
                             //If there are employees who completed all of entered courses print them
-                            if (intersect.Count > 0)
+                            if (intersect.Count() > 0)
                             {
                                 Console.WriteLine($"{"Employees who complted all of the entered courses",75}");
                                 PrintDashes();
 
                                 Console.WriteLine($"{"EmployeeNum",-15}{"FirstName",-20}{"Surname",-20}");
-                                if (intersect.Count != 0)
+                                if (intersect.Count() != 0)
                                 {
                                     foreach (var employee in intersect)
                                     {
@@ -201,7 +201,7 @@ namespace Lab3
                                 codes.Add(input);
                             }
                             
-                            if(codes.Count < 2 && codes.First() == string.Empty) // If user entered no coureses
+                            if(codes.Count() < 2 && codes.First() == string.Empty) // If user entered no coureses
                             {
                                 Console.WriteLine("You haven't entered any courses"); 
                                 break;
@@ -220,7 +220,7 @@ namespace Lab3
                                 }
                             }
 
-                            if (set.Count > 0) // If there are employees who completed any of entered courses print them
+                            if (set.Count() > 0) // If there are employees who completed any of entered courses print them
                             {
                                 Console.WriteLine($"{"Employees who complted any of the entered courses",75}");
                                 PrintDashes();
